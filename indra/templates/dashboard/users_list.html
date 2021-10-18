@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'dashboard/modules/header.html' %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'dashboard/modules/sidebar_nav.html' %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Welcome {{ user.get_username }}</h1>
+            </div>
+            <!-- main cointent -->
+            {% if perms.users %}
+            <a class="btn btn-primary" href="{% url 'user_create' %}">Add new user</a>
+            {% endif %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if profiles and perms.users %}
+                    {% for profile in profiles %}
+                    <tr>
+                        <td>{{profile.user.first_name}}</td>
+                        <td>{{profile.user.last_name}}</td>
+                        <td>{{profile.user.email}}</td>
+                        <td>
+                            <a class="btn btn-primary" href="{% url 'user_update' profile.id %}">Update</a>
+                            <a class="btn {% if profile.user.id == user.id %}btn-secondary{% else %}btn-danger {% endif %}" href="{% if profile.user.id == user.id %}#{% else %}{% url 'user_delete' profile.user.id %}{% endif %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4">{% if perms.users %}Without results{% else %}You need permissions to see the users{% endif %}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </main>
+    </div>
+</div>
+
+{% endblock %}

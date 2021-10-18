@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load extras %}
+
+{% block content %}
+{% include 'dashboard/modules/header.html' %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'dashboard/modules/sidebar_nav.html' %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Welcome {{ user.get_username }}</h1>
+            </div>
+            <!-- main cointent -->
+            <form method="post" {% if profile %} action="{% url 'user_update' profile.user.id  %}"{% endif %} enctype="multipart/form-data" class="mb-5">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" {% if profile %}value="{{profile.user.email}}"{% endif %} required>
+                </div>
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" {% if profile %}value="{{profile.user.first_name}}"{% endif %} required>
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" {% if profile %}value="{{profile.user.last_name}}"{% endif %} required>
+                </div>
+                <div class="mb-3">
+                    <label for="mobile_number" class="form-label">Mobile Number</label>
+                    <input type="number" class="form-control" id="mobile_number" name="mobile_number" {% if profile %}value="{{profile.mobile_number}}"{% endif %}>
+                </div>
+                {% if profile is None %}
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                {% endif %}                
+                <div class="mb-3">
+                    <label for="docfile_1" class="form-label">File 1</label>
+                    <input class="form-control" type="file" id="docfile_1" name="docfile_1" accept="application/pdf">
+                    {% if profile.file_1 %}<small id="file1lHelp" class="form-text text-muted">{{profile.filename_1}}</small>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="docfile_2" class="form-label">File 2</label>
+                    <input class="form-control" type="file" id="docfile_2" name="docfile_2" accept="application/pdf">
+                    {% if profile.file_2 %}<small id="file2lHelp" class="form-text text-muted">{{profile.filename_2}}</small>{% endif %}
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="user_root" name="user_root" {% if profile and profile.user|has_group:"No root" %}checked{% endif %}>
+                    <label class="form-check-label" for="user_root">
+                      Admin
+                    </label>
+                    <div id="rootHelp" class="form-text">Check if user has root permisions.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">{% if profile %}Update{% else %}create{% endif %}</button>
+            </form>
+        </main>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'dashboard/modules/header.html' %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'dashboard/modules/sidebar_nav.html' %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Welcome {{ user.get_username }}</h1>
+            </div>
+            <!-- main cointent -->
+            <form method="post" {% if project %} action="{% url 'project_update' project.id  %}"{% endif %} enctype="multipart/form-data" class="mb-5">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="project_name" class="form-label">Project Name</label>
+                    <input type="text" class="form-control" id="project_name" name="project_name" {% if project %}value="{{project.name}}"{% endif %} required>
+                </div>
+                <div class="mb-3">
+                    <label for="project_details" class="form-label">Project details</label>
+                    <textarea class="form-control" id="project_details" name="project_details" rows="3" required> {% if project %}{{project.details}}{% endif %}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="project_state" class="form-label">Project status</label>
+                    <select class="form-select" id="project_state" name="project_state">
+                        <option value="AP" {% if project and project.state == 'AP' %}selected{% endif %}>Approved</option>
+                        <option value="RE" {% if project and project.state == 'RE' %}selected{% endif %}>Reprobate</option>
+                        <option value="AC" {% if project and project.state == 'AC' %}selected{% endif %}>Accepted</option>
+                        <option value="IR" {% if project and project.state == 'IR' %}selected{% endif %}>In review</option>
+                    </select>
+                </div>       
+                <div class="mb-3">
+                    <label for="project_docfile_1" class="form-label">File 1</label>
+                    <input class="form-control" type="file" id="project_docfile_1" name="project_docfile_1" accept="application/pdf">
+                    {% if project.file_1 %}<small id="file1lHelp" class="form-text text-muted">{{project.filename_1}}</small>{% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">{% if project %}Update{% else %}Create{% endif %}</button>
+            </form>
+        </main>
+    </div>
+</div>
+
+{% endblock %}

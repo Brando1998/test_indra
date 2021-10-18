@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'dashboard/modules/header.html' %}
+<div class="container-fluid">
+    {% csrf_token %}
+    <div class="row">
+        {% include 'dashboard/modules/sidebar_nav.html' %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Welcome {{ user.get_username }}</h1>
+            </div>
+            <!-- main cointent -->
+            <a class="btn btn-primary" href="{% url 'project_create' %}">Add new project</a>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if projects %}
+                    {% for project in projects %}
+                    <tr>
+                        <td>{{project.name}}</td>
+                        <td>{{project.description}}</td>
+                        <td>
+                            <select class="form-select" id="project_status" name="project_status" onchange="project_status(this)" data-url="{% url 'project_change_status' project.id %}">
+                                <option value="AP" {% if project.state == 'AP' %}selected{% endif %}>Approved</option>
+                                <option value="RE" {% if project.state == 'RE' %}selected{% endif %}>Reprobate</option>
+                                <option value="AC" {% if project.state == 'AC' %}selected{% endif %}>Accepted</option>
+                                <option value="IR" {% if project.state == 'IR' %}selected{% endif %}>In review</option>
+                            </select>
+                        </td>
+                        <td>
+                            <a class="btn btn-primary" href="{% url 'project_update' project.id %}">Update</a>
+                            <a class="btn btn-danger" href="{% url 'project_delete' project.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4">Without results</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </main>
+    </div>
+</div>
+
+<script>
+    function project_status(self){
+        self.disabled = true
+        let url = self.dataset.url
+        let value = self.value
+        const csrftoken = getCookie('csrftoken');
+        postData(url, { "state": value }, csrftoken)
+        .then(data => {
+            resp = data["success"]?data["success"]:data["error"]
+            window.alert(resp);
+            self.disabled = false
+        });
+    }
+</script>
+
+{% endblock %}
